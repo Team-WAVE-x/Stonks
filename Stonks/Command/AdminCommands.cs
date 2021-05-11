@@ -8,6 +8,11 @@ namespace Stonks.Command
 {
     public class AdminCommand : InteractiveBase<SocketCommandContext>
     {
+        /*
+         * Todo List
+         * ReactMessage로 재시작 확인
+         */
+
         [Command("재시작", RunMode = RunMode.Async)]
         public async Task RestartAsync()
         {

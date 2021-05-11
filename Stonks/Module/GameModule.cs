@@ -17,8 +17,8 @@ namespace Stonks.Module
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"INSERT INTO table_{guildid} (userid, money, round) VALUES(@userid, 0, 0)";
-                    sqlCom.Parameters.AddWithValue("@userid", userid);
+                    sqlCom.CommandText = $"INSERT INTO TABLE_{guildid} (USERID, MONEY, ROUND) VALUES(@USERID, 0, 0)";
+                    sqlCom.Parameters.AddWithValue("@USERID", userid);
                     sqlCom.CommandType = CommandType.Text;
                     sqlCom.ExecuteNonQuery();
                 }
@@ -36,7 +36,7 @@ namespace Stonks.Module
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"CREATE TABLE table_{guildid} (_id INT PRIMARY KEY AUTO_INCREMENT,userid BIGINT NOT NULL,money BIGINT NOT NULL,round INT NOT NULL) ENGINE = INNODB;";
+                    sqlCom.CommandText = $"CREATE TABLE TABLE_{guildid} (_ID INT PRIMARY KEY AUTO_INCREMENT, USERID BIGINT NOT NULL, MONEY BIGINT NOT NULL, ROUND INT NOT NULL) ENGINE = INNODB;";
                     sqlCom.CommandType = CommandType.Text;
                     sqlCom.ExecuteNonQuery();
                 }
@@ -58,8 +58,8 @@ namespace Stonks.Module
                     using (var sqlCom = new MySqlCommand())
                     {
                         sqlCom.Connection = sCon;
-                        sqlCom.CommandText = $"SELECT * FROM table_{guildid} WHERE NOT money=0 ORDER BY money DESC LIMIT @limit;";
-                        sqlCom.Parameters.AddWithValue("@limit", limit);
+                        sqlCom.CommandText = $"SELECT * FROM TABLE_{guildid} WHERE NOT MONEY=0 ORDER BY MONEY DESC LIMIT @LIMIT;";
+                        sqlCom.Parameters.AddWithValue("@LIMIT", limit);
                         sqlCom.CommandType = CommandType.Text;
 
                         using (MySqlDataReader reader = sqlCom.ExecuteReader())
@@ -95,15 +95,15 @@ namespace Stonks.Module
                     using (var sqlCom = new MySqlCommand())
                     {
                         sqlCom.Connection = sCon;
-                        sqlCom.CommandText = $"SELECT * FROM table_{guildid} WHERE NOT round=0 ORDER BY round DESC LIMIT @limit;";
-                        sqlCom.Parameters.AddWithValue("@limit", limit);
+                        sqlCom.CommandText = $"SELECT * FROM TABLE_{guildid} WHERE NOT ROUND=0 ORDER BY ROUND DESC LIMIT @LIMIT;";
+                        sqlCom.Parameters.AddWithValue("@LIMIT", limit);
                         sqlCom.CommandType = CommandType.Text;
 
                         using (MySqlDataReader reader = sqlCom.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                users.Add(new Class.User(guildid, Convert.ToUInt64(reader["userid"])));
+                                users.Add(new Class.User(guildid, Convert.ToUInt64(reader["USERID"])));
                             }
                         }
                     }
@@ -130,7 +130,7 @@ namespace Stonks.Module
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"SELECT * FROM DICTIONARY AS r1 JOIN (SELECT(RAND() * (SELECT MAX(ID) FROM DICTIONARY)) AS ID) AS r2 WHERE r1.ID >= r2.ID ORDER BY r1.ID ASC LIMIT 1;";
+                    sqlCom.CommandText = $"SELECT * FROM DICTIONARY AS R1 JOIN (SELECT(RAND() * (SELECT MAX(ID) FROM DICTIONARY)) AS ID) AS R2 WHERE R1.ID >= R2.ID ORDER BY R1.ID ASC LIMIT 1;";
                     sqlCom.CommandType = CommandType.Text;
 
                     using (MySqlDataReader reader = sqlCom.ExecuteReader())
@@ -159,8 +159,8 @@ namespace Stonks.Module
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"SELECT * FROM DICTIONARY WHERE WORD LIKE @word;";
-                    sqlCom.Parameters.AddWithValue("@word", $"{startwith}%");
+                    sqlCom.CommandText = $"SELECT * FROM DICTIONARY WHERE WORD LIKE @WORD;";
+                    sqlCom.Parameters.AddWithValue("@WORD", $"{startwith}%");
                     sqlCom.CommandType = CommandType.Text;
 
                     using (MySqlDataReader reader = sqlCom.ExecuteReader())
@@ -189,8 +189,8 @@ namespace Stonks.Module
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"SELECT WORD FROM DICTIONARY WHERE WORD=@word LIMIT 1;";
-                    sqlCom.Parameters.AddWithValue("@word", word);
+                    sqlCom.CommandText = $"SELECT WORD FROM DICTIONARY WHERE WORD=@WORD LIMIT 1;";
+                    sqlCom.Parameters.AddWithValue("@WORD", word);
                     sqlCom.CommandType = CommandType.Text;
 
                     using (MySqlDataReader reader = sqlCom.ExecuteReader())
@@ -216,8 +216,8 @@ namespace Stonks.Module
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"SELECT * FROM DICTIONARY WHERE WORD LIKE @text ORDER BY LENGTH(WORD);";
-                    sqlCom.Parameters.AddWithValue("@text", $"%{word}%");
+                    sqlCom.CommandText = $"SELECT * FROM DICTIONARY WHERE WORD LIKE @TEXT ORDER BY LENGTH(WORD);";
+                    sqlCom.Parameters.AddWithValue("@TEXT", $"%{word}%");
                     sqlCom.CommandType = CommandType.Text;
 
                     using (MySqlDataReader reader = sqlCom.ExecuteReader())

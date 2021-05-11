@@ -688,7 +688,7 @@ namespace Stonks.Command
 
             Discord.Rest.RestUserMessage message = await Context.Channel.SendMessageAsync(embed: builder.Build());
 
-            Action action1 = async delegate ()
+            Action action = async delegate ()
             {
                 using (WebClient client = new WebClient())
                 {
@@ -709,7 +709,7 @@ namespace Stonks.Command
             CreateReactMessage(
                 msg: message,
                 emoji: new List<IEmote> { new Emoji("➡️") },
-                action: new List<Action> { action1 },
+                action: new List<Action> { action },
                 timeSpan: TimeSpan.FromMinutes(1),
                 userId: Context.Message.Author.Id
             );

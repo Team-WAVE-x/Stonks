@@ -6,6 +6,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using static Stonks.Program;
+using static Stonks.Module.SettingModule;
 
 namespace Stonks
 {
@@ -58,7 +59,7 @@ namespace Stonks
             builder.AddField("오류 내용", result, false);
             builder.AddField("오류 이유", result.ErrorReason, false);
 
-            await context.Client.GetUserAsync(515833390524530688).Result.SendMessageAsync(string.Empty, false, builder.Build());
+            await context.Client.GetUserAsync(Convert.ToUInt64(GetSettingInfo().DeveloperID)).Result.SendMessageAsync(string.Empty, false, builder.Build());
         }
     }
 }

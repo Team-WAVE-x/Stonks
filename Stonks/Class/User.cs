@@ -24,20 +24,21 @@ namespace Stonks.Class
                 using (var sCon = new MySqlConnection(GetSettingInfo().ConnectionString))
                 {
                     sCon.Open();
+
                     using (var sqlCom = new MySqlCommand())
                     {
                         sqlCom.Connection = sCon;
-                        sqlCom.CommandText = $"SELECT * FROM table_{guildid} WHERE userid=@id";
-                        sqlCom.Parameters.AddWithValue("@id", id);
+                        sqlCom.CommandText = $"SELECT * FROM TABLE_{guildid} WHERE USERID=@ID";
+                        sqlCom.Parameters.AddWithValue("@ID", id);
                         sqlCom.CommandType = CommandType.Text;
 
                         using (MySqlDataReader reader = sqlCom.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                Id = Convert.ToUInt64(reader["_id"]);
-                                Money = Convert.ToUInt64(reader["money"]);
-                                Round = Convert.ToInt32(reader["round"]);
+                                Id = Convert.ToUInt64(reader["_ID"]);
+                                Money = Convert.ToUInt64(reader["MONEY"]);
+                                Round = Convert.ToInt32(reader["ROUND"]);
                             }
 
                             if (!reader.HasRows)
@@ -62,15 +63,17 @@ namespace Stonks.Class
             using (var sCon = new MySqlConnection(GetSettingInfo().ConnectionString))
             {
                 sCon.Open();
+
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"UPDATE table_{GuildId} SET money=money+@money WHERE userid=@id";
-                    sqlCom.Parameters.AddWithValue("@money", money);
-                    sqlCom.Parameters.AddWithValue("@id", UserId);
+                    sqlCom.CommandText = $"UPDATE TABLE_{GuildId} SET MONEY=MONEY+@MONEY WHERE USERID=@ID";
+                    sqlCom.Parameters.AddWithValue("@MONEY", money);
+                    sqlCom.Parameters.AddWithValue("@ID", UserId);
                     sqlCom.CommandType = CommandType.Text;
                     sqlCom.ExecuteNonQuery();
                 }
+
                 sCon.Close();
             }
         }
@@ -80,15 +83,17 @@ namespace Stonks.Class
             using (var sCon = new MySqlConnection(GetSettingInfo().ConnectionString))
             {
                 sCon.Open();
+
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"UPDATE table_{GuildId} SET money=money-@money WHERE userid=@id";
-                    sqlCom.Parameters.AddWithValue("@money", money);
-                    sqlCom.Parameters.AddWithValue("@id", UserId);
+                    sqlCom.CommandText = $"UPDATE TABLE_{GuildId} SET MONEY=MONEY-@MONEY WHERE USERID=@ID";
+                    sqlCom.Parameters.AddWithValue("@MONEY", money);
+                    sqlCom.Parameters.AddWithValue("@ID", UserId);
                     sqlCom.CommandType = CommandType.Text;
                     sqlCom.ExecuteNonQuery();
                 }
+
                 sCon.Close();
             }
         }
@@ -98,15 +103,17 @@ namespace Stonks.Class
             using (var sCon = new MySqlConnection(GetSettingInfo().ConnectionString))
             {
                 sCon.Open();
+
                 using (var sqlCom = new MySqlCommand())
                 {
                     sqlCom.Connection = sCon;
-                    sqlCom.CommandText = $"UPDATE table_{GuildId} SET round=@round WHERE userid=@id";
-                    sqlCom.Parameters.AddWithValue("@round", round);
-                    sqlCom.Parameters.AddWithValue("@id", UserId);
+                    sqlCom.CommandText = $"UPDATE TABLE_{GuildId} SET ROUND=@ROUND WHERE USERID=@id";
+                    sqlCom.Parameters.AddWithValue("@ROUND", round);
+                    sqlCom.Parameters.AddWithValue("@ID", UserId);
                     sqlCom.CommandType = CommandType.Text;
                     sqlCom.ExecuteNonQuery();
                 }
+
                 sCon.Close();
             }
         }
