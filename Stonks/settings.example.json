@@ -1,0 +1,5 @@
+﻿{
+  "token": "TOKEN_HERE",
+  "connection_string":"MYSQL_CONNECTION_STRING_HERE",
+  "developer_id":"YOUR_DISCORD_ID_HERE"
+}
