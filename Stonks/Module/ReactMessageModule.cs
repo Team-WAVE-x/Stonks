@@ -12,7 +12,7 @@ namespace Stonks.Module
         public static async void CreateReactMessage(RestUserMessage msg, List<IEmote> emoji, List<Action> action, TimeSpan timeSpan, ulong userId)
         {
             if (emoji.Count != action.Count)
-                throw new Exception("Emoji 리스트의 길이는 Action 리스트의 길이와 같아야 합니다.");
+                throw new ArgumentException("Emoji list and Action list must have the same length.");
 
             MemoryCache cache = MemoryCache.Default;
             CacheItemPolicy policy = new CacheItemPolicy { SlidingExpiration = timeSpan };

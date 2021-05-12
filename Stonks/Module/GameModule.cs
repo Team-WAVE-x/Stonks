@@ -49,34 +49,27 @@ namespace Stonks.Module
         {
             List<Class.User> users = new List<Class.User>();
 
-            try
+            using (var sCon = new MySqlConnection(GetSettingInfo().ConnectionString))
             {
-                using (var sCon = new MySqlConnection(GetSettingInfo().ConnectionString))
+                sCon.Open();
+
+                using (var sqlCom = new MySqlCommand())
                 {
-                    sCon.Open();
+                    sqlCom.Connection = sCon;
+                    sqlCom.CommandText = $"SELECT * FROM TABLE_{guildid} WHERE NOT MONEY=0 ORDER BY MONEY DESC LIMIT @LIMIT;";
+                    sqlCom.Parameters.AddWithValue("@LIMIT", limit);
+                    sqlCom.CommandType = CommandType.Text;
 
-                    using (var sqlCom = new MySqlCommand())
+                    using (MySqlDataReader reader = sqlCom.ExecuteReader())
                     {
-                        sqlCom.Connection = sCon;
-                        sqlCom.CommandText = $"SELECT * FROM TABLE_{guildid} WHERE NOT MONEY=0 ORDER BY MONEY DESC LIMIT @LIMIT;";
-                        sqlCom.Parameters.AddWithValue("@LIMIT", limit);
-                        sqlCom.CommandType = CommandType.Text;
-
-                        using (MySqlDataReader reader = sqlCom.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
-                                users.Add(new Class.User(guildid, Convert.ToUInt64(reader["userid"])));
-                            }
+                            users.Add(new Class.User(guildid, Convert.ToUInt64(reader["userid"])));
                         }
                     }
-
-                    sCon.Close();
                 }
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("SQL ERROR!");
+
+                sCon.Close();
             }
 
             return users;
@@ -86,34 +79,27 @@ namespace Stonks.Module
         {
             List<Class.User> users = new List<Class.User>();
 
-            try
+            using (var sCon = new MySqlConnection(GetSettingInfo().ConnectionString))
             {
-                using (var sCon = new MySqlConnection(GetSettingInfo().ConnectionString))
+                sCon.Open();
+
+                using (var sqlCom = new MySqlCommand())
                 {
-                    sCon.Open();
+                    sqlCom.Connection = sCon;
+                    sqlCom.CommandText = $"SELECT * FROM TABLE_{guildid} WHERE NOT ROUND=0 ORDER BY ROUND DESC LIMIT @LIMIT;";
+                    sqlCom.Parameters.AddWithValue("@LIMIT", limit);
+                    sqlCom.CommandType = CommandType.Text;
 
-                    using (var sqlCom = new MySqlCommand())
+                    using (MySqlDataReader reader = sqlCom.ExecuteReader())
                     {
-                        sqlCom.Connection = sCon;
-                        sqlCom.CommandText = $"SELECT * FROM TABLE_{guildid} WHERE NOT ROUND=0 ORDER BY ROUND DESC LIMIT @LIMIT;";
-                        sqlCom.Parameters.AddWithValue("@LIMIT", limit);
-                        sqlCom.CommandType = CommandType.Text;
-
-                        using (MySqlDataReader reader = sqlCom.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
-                                users.Add(new Class.User(guildid, Convert.ToUInt64(reader["USERID"])));
-                            }
+                            users.Add(new Class.User(guildid, Convert.ToUInt64(reader["USERID"])));
                         }
                     }
-
-                    sCon.Close();
                 }
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("SQL ERROR!");
+
+                sCon.Close();
             }
 
             return users;

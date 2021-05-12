@@ -667,9 +667,9 @@ namespace Stonks.Command
             }
         }
 
-        [Command("야옹", RunMode = RunMode.Async)]
-        [Summary("귀여운 야옹이 사진을 봅니다.")]
-        public async Task AjeAsync()
+        [Command("고양이", RunMode = RunMode.Async)]
+        [Summary("귀여운 고양이 사진을 봅니다.")]
+        public async Task CatAsync()
         {
             EmbedBuilder builder = new EmbedBuilder();
 

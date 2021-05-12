@@ -53,7 +53,7 @@ namespace Stonks
 
                     if (message.Id.ToString() == items.Key && reactMessage.messageEmote.Contains(reaction.Emote) && reactMessage.messageUserId == reaction.UserId) //반응이 달린 메시지의 아이디가 캐싱되어 있다면
                     {
-                        Console.WriteLine($"{reaction.User.Value} 가 '{reaction.Emote.Name}' 를 " + $"{message.Author}의 메시지에 추가하였습니다. ({message.Id}).");
+                        Console.WriteLine("{0} React {1,19} Added React At {2}", DateTime.Now.ToString("HH:mm:ss"), reaction.User.Value, message.Id);
 
                         for (int i = 0; i < reactMessage.messageEmote.Count; i++)
                         {
