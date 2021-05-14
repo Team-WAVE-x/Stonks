@@ -26,5 +26,11 @@ namespace Stonks.Module
 
             Console.WriteLine("{0} Cache {1,24} Cached", DateTime.Now.ToString("HH:mm:ss"), msg.Id);
         }
+
+        public static async void RemoveReactMessage(ulong messageId)
+        {
+            MemoryCache cache = MemoryCache.Default;
+            cache.Remove(messageId.ToString());
+        }
     }
 }
