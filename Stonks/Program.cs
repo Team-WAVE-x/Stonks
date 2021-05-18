@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Stonks.Class;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace Stonks
         public static List<ulong> gamingUser = new List<ulong>();
         public static List<DateTimeOffset> stackCooldownTimer = new List<DateTimeOffset>();
         public static List<SocketGuildUser> stackCooldownTarget = new List<SocketGuildUser>();
+        public static Stopwatch uptimeStopwatch = new Stopwatch();
         public static DiscordSocketClient client;
 
         private static void Main(string[] args)
@@ -31,6 +33,7 @@ namespace Stonks
                 client.Log += LogAsync;
                 client.ReactionAdded += ReactionAddedAsync;
                 services.GetRequiredService<CommandService>().Log += LogAsync;
+                uptimeStopwatch.Start();
 
                 await client.LoginAsync(TokenType.Bot, GetSettingInfo().Token);
                 await client.StartAsync();

@@ -5,6 +5,7 @@ using Discord.Addons.Interactive;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using static Stonks.Program;
 using static Stonks.Module.SettingModule;
 using static Stonks.Module.ReactMessageModule;
 
@@ -68,6 +69,25 @@ namespace Stonks.Command
             {
                 await Context.Channel.SendMessageAsync("❌ 개발자만 사용할 수 있는 명령어입니다.");
             }
+        }
+
+        [Command("업타임", RunMode = RunMode.Async)]
+        public async Task UptimeAsync()
+        {
+            EmbedBuilder builder = new EmbedBuilder();
+            TimeSpan uptime = TimeSpan.FromMilliseconds(uptimeStopwatch.ElapsedMilliseconds);
+
+            builder.WithTitle("🕒 업타임");
+            builder.WithDescription($"{uptime.Days} 일 {uptime.Hours} 시간 {uptime.Minutes} 분 {uptime.Seconds} 초");
+            builder.WithColor(Color.Teal);
+            builder.WithFooter(new EmbedFooterBuilder
+            {
+                IconUrl = Context.User.GetAvatarUrl(ImageFormat.Png, 128),
+                Text = $"{Context.User.Username}"
+            });
+            builder.WithTimestamp(DateTimeOffset.Now);
+
+            await Context.Channel.SendMessageAsync(embed: builder.Build());
         }
     }
 }
