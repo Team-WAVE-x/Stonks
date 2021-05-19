@@ -1,9 +1,11 @@
-﻿using Discord;
-using Discord.Rest;
-using Stonks.Class;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Caching;
+
+using Discord;
+using Discord.Rest;
+
+using Stonks.Class;
 
 namespace Stonks.Module
 {
@@ -27,7 +29,7 @@ namespace Stonks.Module
             Console.WriteLine("{0} Cache {1,24} Cached", DateTime.Now.ToString("HH:mm:ss"), msg.Id);
         }
 
-        public static async void RemoveReactMessage(ulong messageId)
+        public static void RemoveReactMessage(ulong messageId)
         {
             MemoryCache cache = MemoryCache.Default;
             cache.Remove(messageId.ToString());

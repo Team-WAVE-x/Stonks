@@ -1,7 +1,9 @@
-﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data;
+using System.Collections.Generic;
+
+using MySql.Data.MySqlClient;
+
 using static Stonks.Module.SettingModule;
 
 namespace Stonks.Module

@@ -1,11 +1,13 @@
-﻿using Discord;
-using Discord.Addons.Interactive;
-using Discord.Commands;
-using Discord.Rest;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+
+using Discord;
+using Discord.Rest;
+using Discord.Commands;
+using Discord.Addons.Interactive;
+
 using static Stonks.CommandHandling;
 using static Stonks.Module.ReactMessageModule;
 

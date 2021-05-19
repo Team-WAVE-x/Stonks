@@ -1,26 +1,29 @@
-﻿using Discord;
-using Discord.Addons.Interactive;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using Stonks.Class;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using Discord.Addons.Interactive;
+
+using Microsoft.Extensions.DependencyInjection;
+
+using Stonks.Class;
 using static Stonks.Module.SettingModule;
 
 namespace Stonks
 {
     internal class Program
     {
-        public static List<ulong> gamingUser = new List<ulong>();
+        public static DiscordSocketClient client;
+        public static Stopwatch uptimeStopwatch = new Stopwatch();
+        public static List<ulong> GamingUserList = new List<ulong>();
         public static List<DateTimeOffset> stackCooldownTimer = new List<DateTimeOffset>();
         public static List<SocketGuildUser> stackCooldownTarget = new List<SocketGuildUser>();
-        public static Stopwatch uptimeStopwatch = new Stopwatch();
-        public static DiscordSocketClient client;
 
         private static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();

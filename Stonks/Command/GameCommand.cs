@@ -1,14 +1,18 @@
-﻿using Discord;
-using Discord.Addons.Interactive;
-using Discord.Commands;
-using Discord.WebSocket;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.Linq;
 using System.Net;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using Discord.Addons.Interactive;
+
+using Newtonsoft.Json.Linq;
+
+
 using static Stonks.Module.GameModule;
 using static Stonks.Module.ReactMessageModule;
 using static Stonks.Program;
@@ -312,7 +316,7 @@ namespace Stonks.Command
             await ReplyAsync("끝말잇기 시작!");
             await ReplyAsync($"{word}!"); //아무 단어나 가져와서 메시지를 보냄
             usedWords.Add(word); //그리고 사용한 단어 리스트에 집어넣음
-            gamingUser.Add(Context.Message.Author.Id); //게임중인 유저를 봇이 무시하도록 리스트에 집어넣음
+            GamingUserList.Add(Context.Message.Author.Id); //게임중인 유저를 봇이 무시하도록 리스트에 집어넣음
 
             Stopwatch sw = new Stopwatch(); //스탑워치를 정의함
 
@@ -560,7 +564,7 @@ namespace Stonks.Command
                 user.setScore(round);
             }
 
-            gamingUser.Remove(Context.Message.Author.Id);
+            GamingUserList.Remove(Context.Message.Author.Id);
             sw.Stop();
             sw.Reset();
         }
@@ -681,7 +685,7 @@ namespace Stonks.Command
                 builder.WithFooter(new EmbedFooterBuilder 
                 { 
                     IconUrl = Context.User.GetAvatarUrl(ImageFormat.Png, 128),
-                    Text = $"{Context.User.Username}" 
+                    Text = Context.User.Username
                 });
                 builder.WithTimestamp(DateTimeOffset.Now);
             }
@@ -698,7 +702,7 @@ namespace Stonks.Command
                     builder.WithFooter(new EmbedFooterBuilder
                     {
                         IconUrl = Context.User.GetAvatarUrl(ImageFormat.Png, 128),
-                        Text = $"{Context.User.Username}"
+                        Text = Context.User.Username
                     });
                     builder.WithTimestamp(DateTimeOffset.Now);
                 }

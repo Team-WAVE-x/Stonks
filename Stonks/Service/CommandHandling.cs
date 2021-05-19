@@ -1,10 +1,13 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using static Stonks.Program;
 using static Stonks.Module.SettingModule;
 
@@ -35,7 +38,7 @@ namespace Stonks
             if (!(rawMessage is SocketUserMessage message)) return;
             if (message.Source != MessageSource.User) return;
             if (rawMessage.Channel is IPrivateChannel) return;
-            if (gamingUser.Contains(rawMessage.Author.Id)) return;
+            if (GamingUserList.Contains(rawMessage.Author.Id)) return;
 
             var argPos = 0;
             if (!message.HasStringPrefix("/", ref argPos)) return;
@@ -52,14 +55,21 @@ namespace Stonks
                 return;
 
             EmbedBuilder builder = new EmbedBuilder();
+
             builder.WithTitle("Stonks 오류 리포트");
             builder.WithDescription("Stonks 봇에서 심각한 오류가 발생하였습니다.");
             builder.WithColor(Color.Red);
             builder.AddField("발생 시각", DateTime.Now.ToString("G"), false);
             builder.AddField("오류 내용", result, false);
             builder.AddField("오류 이유", result.ErrorReason, false);
+            builder.WithFooter(new EmbedFooterBuilder
+            {
+                IconUrl = client.CurrentUser.GetAvatarUrl(),
+                Text = client.CurrentUser.Username
+            });
+            builder.WithTimestamp(DateTimeOffset.Now);
 
-            await context.Client.GetUserAsync(Convert.ToUInt64(GetSettingInfo().DeveloperID)).Result.SendMessageAsync(string.Empty, false, builder.Build());
+            await context.Client.GetUserAsync(GetSettingInfo().DeveloperID).Result.SendMessageAsync(embed: builder.Build());
         }
     }
 }
