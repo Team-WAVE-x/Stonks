@@ -18,7 +18,7 @@ namespace Stonks.Command
         [Command("재시작", RunMode = RunMode.Async)]
         public async Task RestartAsync()
         {
-            if (Context.User.Id.ToString() == GetSettingInfo().DeveloperID)
+            if (Context.User.Id == GetSettingInfo().DeveloperID)
             {
                 EmbedBuilder builder = new EmbedBuilder();
                 builder.WithTitle("🔄 재시작");
@@ -55,8 +55,8 @@ namespace Stonks.Command
                 {
                     RemoveReactMessage(message.Id);
 
+                    await message.RemoveAllReactionsAsync();
                     await message.ModifyAsync(msg => { msg.Content = "❌ 작업이 취소되었습니다."; msg.Embed = null; });
-                    await message.Channel.SendMessageAsync("❌ 작업이 취소되었습니다.");
                 };
 
                 CreateReactMessage(
