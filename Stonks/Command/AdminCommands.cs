@@ -7,6 +7,8 @@ using Discord.Rest;
 using Discord.Commands;
 using Discord.Addons.Interactive;
 
+using Westwind.Scripting;
+
 using static Stonks.Program;
 using static Stonks.Module.SettingModule;
 using static Stonks.Module.ReactMessageModule;
@@ -90,6 +92,44 @@ namespace Stonks.Command
             builder.WithTimestamp(DateTimeOffset.Now);
 
             await Context.Channel.SendMessageAsync(embed: builder.Build());
+        }
+
+        [Command("실행", RunMode = RunMode.Async)]
+        public async Task EvalAsync([Remainder] string code)
+        {
+            if (code.StartsWith("```cs") && code.EndsWith("```"))
+            {
+                code = code.Remove(0, 5);
+                code = code.Remove(code.Length - 3, 3);
+
+                var script = new CSharpScriptExecution()
+                {
+                    SaveGeneratedCode = true,
+                    CompilerMode = ScriptCompilerModes.Classic
+                };
+                script.AddDefaultReferencesAndNamespaces();
+
+                string result = script.ExecuteCode(code) as string;
+
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.WithTitle("🏃 실행");
+                builder.AddField("결과", $"```{result ?? "결과 없음"}```");
+                builder.AddField("오류 메시지", $"```{script.ErrorMessage ?? "결과 없음"}```");
+                builder.AddField("생성된 코드", $"```{script.GeneratedClassCodeWithLineNumbers}```");
+                builder.WithColor(script.Error ? Color.Red : Color.Teal);
+                builder.WithFooter(new EmbedFooterBuilder
+                {
+                    IconUrl = Context.User.GetAvatarUrl(ImageFormat.Png, 128),
+                    Text = $"{Context.User.Username}"
+                });
+                builder.WithTimestamp(DateTimeOffset.Now);
+
+                await Context.Channel.SendMessageAsync(embed: builder.Build());
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("❌ 실행할 코드는 반드시 코드 블럭으로 감싸야 합니다.");
+            }
         }
     }
 }
