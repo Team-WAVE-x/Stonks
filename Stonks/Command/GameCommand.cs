@@ -690,7 +690,7 @@ namespace Stonks.Command
                 builder.WithTimestamp(DateTimeOffset.Now);
             }
 
-            Discord.Rest.RestUserMessage message = await Context.Channel.SendMessageAsync(embed: builder.Build());
+            var message = await Context.Channel.SendMessageAsync(embed: builder.Build());
 
             Action action = async delegate ()
             {

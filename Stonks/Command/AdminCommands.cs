@@ -17,6 +17,10 @@ namespace Stonks.Command
 {
     public class AdminCommand : InteractiveBase<SocketCommandContext>
     {
+        private bool ClassicMode = false;
+        private List<string> AssemblyList = new List<string>();
+        private List<string> NamespaceList = new List<string>();
+
         [Command("재시작", RunMode = RunMode.Async)]
         public async Task RestartAsync()
         {
@@ -105,16 +109,27 @@ namespace Stonks.Command
                 var script = new CSharpScriptExecution()
                 {
                     SaveGeneratedCode = true,
-                    CompilerMode = ScriptCompilerModes.Classic
+                    CompilerMode = ClassicMode ? ScriptCompilerModes.Classic : ScriptCompilerModes.Roslyn,
                 };
+
                 script.AddDefaultReferencesAndNamespaces();
+
+                foreach (var item in AssemblyList)
+                {
+                    script.AddAssembly(item);
+                }
+
+                foreach (var item in NamespaceList)
+                {
+                    script.AddNamespace(item);
+                }
 
                 string result = script.ExecuteCode(code) as string;
 
                 EmbedBuilder builder = new EmbedBuilder();
                 builder.WithTitle("🏃 실행");
-                builder.AddField("결과", $"```{result ?? "결과 없음"}```");
-                builder.AddField("오류 메시지", $"```{script.ErrorMessage ?? "결과 없음"}```");
+                builder.AddField("결과", $"```{result ?? "-"}```");
+                builder.AddField("오류 메시지", $"```{script.ErrorMessage ?? "-"}```");
                 builder.AddField("생성된 코드", $"```{script.GeneratedClassCodeWithLineNumbers}```");
                 builder.WithColor(script.Error ? Color.Red : Color.Teal);
                 builder.WithFooter(new EmbedFooterBuilder
@@ -130,6 +145,110 @@ namespace Stonks.Command
             {
                 await Context.Channel.SendMessageAsync("❌ 실행할 코드는 반드시 코드 블럭으로 감싸야 합니다.");
             }
+        }
+
+        [Command("설정", RunMode = RunMode.Async)]
+        public async Task EvalSettingAsync()
+        {
+            EmbedBuilder builder;
+
+            void BuildEmbed()
+            {
+                builder = new EmbedBuilder();
+                builder.WithTitle("⚙️ 실행 설정");
+                builder.AddField("1", string.Format("어셈블리 추가 - [{0}]", AssemblyList.Count == 0 ? "비어 있음" : String.Join(", ", AssemblyList)));
+                builder.AddField("2", string.Format("네임스페이스 추가 - [{0}]", NamespaceList.Count == 0 ? "비어 있음" : String.Join(", ", NamespaceList)));
+                builder.AddField("3", string.Format("Classic 모드 - [{0}]", ClassicMode ? "On" : "Off"));
+                builder.AddField("4", $"설정 초기화");
+                builder.WithColor(Color.Teal);
+                builder.WithFooter(new EmbedFooterBuilder
+                {
+                    IconUrl = Context.User.GetAvatarUrl(ImageFormat.Png, 128),
+                    Text = $"{Context.User.Username}"
+                });
+                builder.WithTimestamp(DateTimeOffset.Now);
+            }
+
+            BuildEmbed();
+
+            var message = await Context.Channel.SendMessageAsync(embed: builder.Build());
+
+            Action assemblyAddAction = async delegate ()
+            {
+                await Context.Channel.SendMessageAsync("추가할 어셈블리의 이름을 입력해 주세요. (예: System.dll)");
+
+                var response = await NextMessageAsync(true, true, TimeSpan.FromMinutes(1));
+
+                if (response != null)
+                {
+                    AssemblyList.Add(response.Content);
+                    BuildEmbed();
+
+                    await message.ModifyAsync(msg => msg.Embed = builder.Build());
+                    await Context.Channel.SendMessageAsync("✅ 어셈블리가 성공적으로 추가되었습니다!");
+                }
+                else
+                {
+                    await Context.Channel.SendMessageAsync("❌ 입력 시간을 초과하셨습니다.");
+                }
+            };
+
+            Action namespaceAddAction = async delegate ()
+            {
+                await Context.Channel.SendMessageAsync("추가할 네임스페이스의 이름을 입력해 주세요. (예: System)");
+
+                var response = await NextMessageAsync(true, true, TimeSpan.FromMinutes(1));
+
+                if (response != null)
+                {
+                    NamespaceList.Add(response.Content);
+                    BuildEmbed();
+
+                    await message.ModifyAsync(msg => msg.Embed = builder.Build());
+                    await Context.Channel.SendMessageAsync("✅ 네임스페이스가 성공적으로 추가되었습니다!");
+                }
+                else
+                {
+                    await Context.Channel.SendMessageAsync("❌ 입력 시간을 초과하셨습니다.");
+                }
+            };
+
+            Action classicModeEnableAction = async delegate ()
+            {
+                if (ClassicMode)
+                {
+                    ClassicMode = false;
+                    BuildEmbed();
+
+                    await message.ModifyAsync(msg => msg.Embed = builder.Build());
+                }
+                else
+                {
+                    ClassicMode = true;
+                    BuildEmbed();
+
+                    await message.ModifyAsync(msg => msg.Embed = builder.Build());
+                }
+            };
+
+            Action resetSettingAction = async delegate ()
+            {
+                AssemblyList.Clear();
+                NamespaceList.Clear();
+                ClassicMode = false;
+                BuildEmbed();
+
+                await message.ModifyAsync(msg => msg.Embed = builder.Build());
+                await Context.Channel.SendMessageAsync("✅ 설정이 초기화되었습니다.");
+            };
+
+            CreateReactMessage(
+                msg: message,
+                emoji: new List<IEmote> { new Emoji("1️⃣"), new Emoji("2️⃣"), new Emoji("3️⃣"), new Emoji("4️⃣") },
+                action: new List<Action> { assemblyAddAction, namespaceAddAction, classicModeEnableAction, resetSettingAction },
+                timeSpan: TimeSpan.FromMinutes(1),
+                userId: Context.Message.Author.Id
+            );
         }
     }
 }
