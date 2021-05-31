@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.Caching;
 using System.Threading;
+using System.Reflection;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Runtime.Caching;
+using System.Collections.Generic;
 
 using Discord;
 using Discord.Commands;
@@ -19,9 +20,18 @@ namespace Stonks
 {
     internal class Program
     {
+        public static CommandService commands;
+        public static IServiceProvider services;
         public static DiscordSocketClient client;
+
         public static Stopwatch uptimeStopwatch = new Stopwatch();
+
+        public static bool ClassicMode = false;
+        public static List<string> AssemblyList = new List<string>();
+        public static List<string> NamespaceList = new List<string>();
+
         public static List<ulong> GamingUserList = new List<ulong>();
+
         public static List<DateTimeOffset> stackCooldownTimer = new List<DateTimeOffset>();
         public static List<SocketGuildUser> stackCooldownTarget = new List<SocketGuildUser>();
 
@@ -30,23 +40,38 @@ namespace Stonks
 
         public async Task MainAsync()
         {
-            using (var services = ConfigureServices())
+            client = new DiscordSocketClient(new DiscordSocketConfig()
             {
-                client = services.GetRequiredService<DiscordSocketClient>();
-                client.Log += LogAsync;
-                client.ReactionAdded += ReactionAddedAsync;
-                services.GetRequiredService<CommandService>().Log += LogAsync;
-                uptimeStopwatch.Start();
+                LogLevel = LogSeverity.Verbose
+            });
 
-                await client.LoginAsync(TokenType.Bot, GetSettingInfo().Token);
-                await client.StartAsync();
-                await client.SetGameAsync("/도움말 | https://teamwv.ml", null, ActivityType.Playing);
-                await services.GetRequiredService<CommandHandling>().InitializeAsync();
-                await Task.Delay(Timeout.Infinite);
-            }
+            commands = new CommandService(new CommandServiceConfig()
+            {
+                LogLevel = LogSeverity.Verbose
+            });
+
+            client.Log += OnClientLogReceived;
+            commands.Log += OnClientLogReceived;
+            client.ReactionAdded += OnReactionAdded;
+            client.MessageReceived += OnClientMessage;
+            commands.CommandExecuted += OnCommandExecuted;
+
+            uptimeStopwatch.Start();
+
+            await client.LoginAsync(TokenType.Bot, GetSettingInfo().Token);
+            await client.StartAsync();
+
+            services = new ServiceCollection()
+                .AddSingleton(client)
+                .AddSingleton<InteractiveService>()
+                .BuildServiceProvider();
+
+            await client.SetGameAsync("/도움말 | https://teamwv.ml", null, ActivityType.Playing);
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+            await Task.Delay(-1);
         }
 
-        private async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)
+        private async Task OnReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel originChannel, SocketReaction reaction)
         {
             var message = await cachedMessage.GetOrDownloadAsync();
             var cache = MemoryCache.Default;
@@ -75,20 +100,49 @@ namespace Stonks
             }
         }
 
-        private Task LogAsync(LogMessage log)
+        public async Task OnCommandExecuted(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
-            Console.WriteLine(log.ToString());
-            return Task.CompletedTask;
+            if (!command.IsSpecified)
+                return;
+            if (result.IsSuccess)
+                return;
+
+            EmbedBuilder builder = new EmbedBuilder();
+
+            builder.WithTitle("Stonks 오류 리포트");
+            builder.WithDescription("Stonks 봇에서 심각한 오류가 발생하였습니다.");
+            builder.WithColor(Color.Red);
+            builder.AddField("발생 시각", DateTime.Now.ToString("G"), false);
+            builder.AddField("오류 내용", result, false);
+            builder.AddField("오류 이유", result.ErrorReason, false);
+            builder.WithFooter(new EmbedFooterBuilder
+            {
+                IconUrl = client.CurrentUser.GetAvatarUrl(),
+                Text = client.CurrentUser.Username
+            });
+            builder.WithTimestamp(DateTimeOffset.Now);
+
+            await context.Client.GetUserAsync(GetSettingInfo().DeveloperID).Result.SendMessageAsync(embed: builder.Build());
         }
 
-        private ServiceProvider ConfigureServices()
+        private async Task OnClientMessage(SocketMessage rawMessage)
         {
-            return new ServiceCollection()
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandling>()
-                .AddSingleton<InteractiveService>()
-                .BuildServiceProvider();
+            if (!(rawMessage is SocketUserMessage message)) return;
+            if (message.Source != MessageSource.User) return;
+            if (rawMessage.Channel is IPrivateChannel) return;
+            if (GamingUserList.Contains(rawMessage.Author.Id)) return;
+
+            var argPos = 0;
+            if (!message.HasStringPrefix("/", ref argPos)) return;
+
+            var context = new SocketCommandContext(client, message);
+            await commands.ExecuteAsync(context, argPos, services);
+        }
+
+        private Task OnClientLogReceived(LogMessage message)
+        {
+            Console.WriteLine(message.ToString());
+            return Task.CompletedTask;
         }
     }
 }

@@ -8,7 +8,7 @@ using Discord.Rest;
 using Discord.Commands;
 using Discord.Addons.Interactive;
 
-using static Stonks.CommandHandling;
+using static Stonks.Program;
 using static Stonks.Module.ReactMessageModule;
 
 namespace Stonks.Command
@@ -30,7 +30,7 @@ namespace Stonks.Command
             //변수 설정
             int page = 0;
             EmbedBuilder[] builders = new EmbedBuilder[2];
-            List<CommandInfo> commands = _commands.Commands.ToList();
+            List<CommandInfo> commands = Program.commands.Commands.ToList();
 
             //builders 변수 초기화
             for (int i = 0; i < 2; i++)

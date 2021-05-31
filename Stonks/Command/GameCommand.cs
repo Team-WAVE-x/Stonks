@@ -12,7 +12,6 @@ using Discord.Addons.Interactive;
 
 using Newtonsoft.Json.Linq;
 
-
 using static Stonks.Module.GameModule;
 using static Stonks.Module.ReactMessageModule;
 using static Stonks.Program;

@@ -17,10 +17,6 @@ namespace Stonks.Command
 {
     public class AdminCommand : InteractiveBase<SocketCommandContext>
     {
-        private bool ClassicMode = false;
-        private List<string> AssemblyList = new List<string>();
-        private List<string> NamespaceList = new List<string>();
-
         [Command("재시작", RunMode = RunMode.Async)]
         public async Task RestartAsync()
         {
@@ -119,7 +115,7 @@ namespace Stonks.Command
                     script.AddAssembly(item);
                 }
 
-                foreach (var item in NamespaceList)
+                foreach (var item in Program.NamespaceList)
                 {
                     script.AddNamespace(item);
                 }
@@ -157,7 +153,7 @@ namespace Stonks.Command
                 builder = new EmbedBuilder();
                 builder.WithTitle("⚙️ 실행 설정");
                 builder.AddField("1", string.Format("어셈블리 추가 - [{0}]", AssemblyList.Count == 0 ? "비어 있음" : String.Join(", ", AssemblyList)));
-                builder.AddField("2", string.Format("네임스페이스 추가 - [{0}]", NamespaceList.Count == 0 ? "비어 있음" : String.Join(", ", NamespaceList)));
+                builder.AddField("2", string.Format("네임스페이스 추가 - [{0}]", Program.NamespaceList.Count == 0 ? "비어 있음" : String.Join(", ", Program.NamespaceList)));
                 builder.AddField("3", string.Format("Classic 모드 - [{0}]", ClassicMode ? "On" : "Off"));
                 builder.AddField("4", $"설정 초기화");
                 builder.WithColor(Color.Teal);
@@ -201,7 +197,7 @@ namespace Stonks.Command
 
                 if (response != null)
                 {
-                    NamespaceList.Add(response.Content);
+                    Program.NamespaceList.Add(response.Content);
                     BuildEmbed();
 
                     await message.ModifyAsync(msg => msg.Embed = builder.Build());
@@ -234,7 +230,7 @@ namespace Stonks.Command
             Action resetSettingAction = async delegate ()
             {
                 AssemblyList.Clear();
-                NamespaceList.Clear();
+                Program.NamespaceList.Clear();
                 ClassicMode = false;
                 BuildEmbed();
 
